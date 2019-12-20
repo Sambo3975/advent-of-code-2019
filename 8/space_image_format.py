@@ -39,7 +39,6 @@ def render(filename, width, height):
         data = data[pixels_in_layer:]
         for i in range(pixels_in_layer):
             rendered_layer[i] = layer[i] if rendered_layer[i] == '2' else rendered_layer[i]
-    # print(rendered_layer)
 
     # Render the image
     render_border(width + 2)
@@ -51,9 +50,6 @@ def render(filename, width, height):
             print(colored('  ', 'white', None if pix == '0' else 'on_white'), end='')
         render_border(1)
     render_border(width + 2)
-
-    # Reset the print colors
-    # print(colored('', 'reset', 'reset'))
 
 
 if __name__ == '__main__':
