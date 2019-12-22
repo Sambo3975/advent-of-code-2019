@@ -34,6 +34,11 @@ class IntcodeComputer:
         self.suspend_on_input = False
         self.can_resume = False  # Cannot resume if the program has not started running or has reached the end
 
+        # If true, the computer will store outputs instead of printing them
+        # Outputs are cleared on program start and resume
+        self.store_output = False
+        self.outputs = None
+
     # File parsing and loading #
 
     def parse(self, string):
@@ -64,17 +69,20 @@ class IntcodeComputer:
 
         self.can_resume = True
 
+        self.outputs = []
+
     def _exec(self):
         while True:
             if self.exec_instr():
-                return self.mem[0]
+                return self.outputs if self.store_output else self.mem[0]
 
-    def run(self, inputs=None, suspend_on_input=False):
+    def run(self, inputs=None, suspend_on_input=False, store_output=False):
         """Load the program into 'main memory' and run it"""
         if self.prog is None:
             print('No program loaded!')
             return
         self.suspend_on_input = suspend_on_input
+        self.store_output = store_output
         self._reset(inputs)
         return self._exec()
 
@@ -89,6 +97,8 @@ class IntcodeComputer:
         else:
             self.inputs = inputs
         self.in_ptr = 0
+
+        self.outputs = []
 
         return self._exec()
 
@@ -162,7 +172,7 @@ class IntcodeComputer:
 
     def mul(self, modes):
         """
-        Multiply yx02,a,b,c : store the product of the values at addresses a and b at address c. x,y are mode
+        Multiply zyx02,a,b,c : store the product of the values at addresses a and b at address c. x,y are mode
         switches
         """
         args = self.get_n_args(2, modes)
@@ -187,7 +197,11 @@ class IntcodeComputer:
 
     def out(self, modes):
         """Output x04,a : print the value at address a using read mode x"""
-        print(self.read(self.mem[self.ip + 1], modes[0]))
+        arg = self.read(self.mem[self.ip + 1], modes[0])
+        if self.store_output:
+            self.outputs.append(arg)
+        else:
+            print(arg)
 
     def jit(self, modes):
         """
