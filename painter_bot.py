@@ -39,7 +39,7 @@ class PainterBot:
             print_string += '\n'
         return print_string[:-1]
 
-    def _move(self):
+    def move(self):
         self.position[0] += self.direction[0]
         self.position[1] += self.direction[1]
         extend_idx = -1
@@ -63,25 +63,29 @@ class PainterBot:
                 self.position[0] -= self.direction[0]
                 self.position[1] -= self.direction[1]
 
-    def _turn(self, instruction):
+    def turn(self, instruction):
         self.direction[0], self.direction[1] = self.direction[1], self.direction[0]
         if instruction:
             self.direction[0] *= -1
         else:
             self.direction[1] *= -1
 
-    def _update(self, instructions):
+    def update(self, instructions):
         # Paint the panel the robot is on
         self.map[int(self.position[1]), int(self.position[0])] = instructions[0]
 
         # Turn to the left or right
-        # Multiplying by 2, then subtracting 1 maps {0, 1} to {-1, 1}
-        # -1 means turn left 90 degrees, 1 means turn right 90 degrees
-        # self.direction = self.direction.rotate((instructions[1] * 2 - 1) * 90)
-        self._turn(instructions[1])
+        self.turn(instructions[1])
 
         # Move forward one space
-        self._move()
+        self.move()
 
         # Get the color of the space the robot moved to
-        return self.map[int(self.position[1]), int(self.position[0])]
+        return 0 if self.map[int(self.position[1]), int(self.position[0])] <= 0 else 1
+
+    def paint(self, starting_color):
+        outputs = self.brain.run(starting_color, True, True)
+        color = self.update(outputs)
+        while self.brain.can_resume:
+            outputs = self.brain.resume(color)
+            color = self.update(outputs)
