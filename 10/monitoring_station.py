@@ -1,5 +1,5 @@
-from math import atan, degrees, sqrt, pi
-from numpy import array, copy, empty, full, arctan2
+from math import sqrt, pi
+from numpy import array, copy, full, arctan2
 from termcolor import colored
 
 
@@ -49,35 +49,27 @@ def print_data(data):
 def count_detectable_asteroids(data, station_r, station_c):
     data = copy(data)
     count = 0
-    # print('--', station_r, station_c)
     for r in range(data.shape[0]):
         for c in range(data.shape[1]):
             if data[r, c] and (station_r != r or c != station_c):
-                # print(r, c)
                 data[r, c] = False
                 count += 1
                 # get the vertical and horizontal differences between the asteroid's position and the station's position
                 step_r = r - station_r
                 step_c = c - station_c
-                # print('before:', step_r, step_c)
                 # Treat it as a ratio and reduce to simplest terms
                 gcd_rc = abs(gcd(step_r, step_c))
                 step_r //= gcd_rc
                 step_c //= gcd_rc
-                # print('after:', step_r, step_c)
 
                 scan_r = station_r + step_r
                 scan_c = station_c + step_c
                 while 0 <= scan_r < data.shape[0] and 0 <= scan_c < data.shape[1]:
-                    # if station_r == 2 and station_c == 1:
-                    #     print('s:', scan_r, scan_c)
-                    #     print_data(data)
                     if data[scan_r, scan_c]:
                         data[scan_r, scan_c] = False
                     scan_r += step_r
                     scan_c += step_c
 
-    # print('---', count)
     return count
 
 
