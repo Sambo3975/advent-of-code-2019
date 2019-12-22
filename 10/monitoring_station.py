@@ -3,22 +3,6 @@ from numpy import array, copy, empty, full, arctan2
 from termcolor import colored
 
 
-# class Target:
-#     def __init__(self, angle, distance, x, y):
-#         self.angle = angle
-#         self.distance = distance
-#         self.x = x
-#         self.y = y
-#
-#     def __lt__(self, other):
-#         if self.angle == other.angle:
-#             return self.distance < other.distance
-#         return self.angle < other.angle
-#
-#     def __repr__(self):
-#         return '(a = %f, d = %.2f, x = %d, y = %d)' % (self.angle, self.distance, self.x, self.y)
-
-
 class Target:
     def __init__(self, x, y):
         self.rho, self.phi = cart2pol(x, y)  # Convert to polar
@@ -142,63 +126,11 @@ def destroy_targets(targets, data, station_x, station_y):
             angle = -2 * pi
 
 
-# Marked for nuking
-# def get_angle(dx, dy):
-#     if dy != 0:
-#         raw_angle = degrees(atan(dx / dy))
-#     else:
-#         raw_angle = 90
-#     if dx >= 0:
-#         return raw_angle if dy >= 0 else 180 - raw_angle
-#     return raw_angle + 180 if dy < 0 else 360 - raw_angle
-
-
 def cart2pol(x, y):
     """Convert Cartesian coordinates to polar"""
     rho = sqrt(x**2 + y**2)
     phi = arctan2(y, x)
     return rho, phi
-
-
-# def get_distance(dx, dy):
-#     return sqrt(dx**2 + dy**2)
-
-
-# def blow_em_up(data, station_x, station_y):
-#     print_data(data)
-#     targets = []
-#     for y in range(data.shape[0]):
-#         for x in range(data.shape[1]):
-#             if data[y, x] and (y != station_y or x != station_x):
-#                 dx = x - station_x
-#                 dy = y - station_y
-#                 rho, phi = cart2pol(dx, dy)
-#                 print('p = (%d, %d), d = (%d, %d), pol = (%f %f)' % (x, y, dx, dy, rho, phi))
-#                 targets.append((x, y, dx, dy, rho, phi))
-#     targets = sorted(targets)
-#     for x in targets:
-#         print(x)
-#
-#     results = full(data.shape, -1, dtype=int, )
-#     for y in range(data.shape[0]):
-#         for x in range(data.shape[1]):
-#             results[y, x] = 0 if data[y, x] else -1
-#     results[station_y, station_x] = -2
-#
-#     destroyed = 0
-#     i = 0
-#     angle = -1
-#     while destroyed < len(targets) and destroyed < 200:
-#         t = targets[i]
-#         if t:
-#             print('destroying', t)
-#             last = t
-#             results[t.y, t.x] = destroyed
-#             targets[i] = None
-#             destroyed += 1
-#         i = (i + 1) % len(targets)
-#
-#     return last.x * 100 + last.y, results
 
 
 def print_blowup_data(data):
