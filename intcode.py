@@ -38,6 +38,9 @@ class IntcodeComputer:
         # Outputs are cleared on program start and resume
         self.store_output = False
         self.outputs = None
+        # If true, the program will be suspended once an output is sent. This is for use with a program that uses
+        # custom rendering for its outputs
+        self.suspend_on_output = False
 
     # File parsing and loading #
 
@@ -76,13 +79,14 @@ class IntcodeComputer:
             if self.exec_instr():
                 return self.outputs if self.store_output else self.mem[0]
 
-    def run(self, inputs=None, suspend_on_input=False, store_output=False):
+    def run(self, inputs=None, suspend_on_input=False, store_output=False, suspend_on_output=False):
         """Load the program into 'main memory' and run it"""
         if self.prog is None:
             print('No program loaded!')
             return
         self.suspend_on_input = suspend_on_input
         self.store_output = store_output
+        self.suspend_on_output = suspend_on_output
         self._reset(inputs)
         return self._exec()
 
@@ -202,6 +206,9 @@ class IntcodeComputer:
             self.outputs.append(arg)
         else:
             print(arg)
+        if self.suspend_on_output:
+            self.ip += 2  # Unlike with input, we still want to move to the next instruction
+            return True
 
     def jit(self, modes):
         """
